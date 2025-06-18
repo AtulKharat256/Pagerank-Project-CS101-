@@ -1,0 +1,71 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+
+\title{CS101 Project 2}
+\author{Atul Kharat}
+\date{April 2024}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+This project asks us to study the dataset which we made by one very fun activity during one of the tutorial classes. Everyone was asked to ask general questions to their peers, and note down the names of which they found the answer impressive. Every student in the class can have up to 30 impressions. We have to make a graph with this dataset, every student is a node and there exist a edge between them if someone found the other person impressive. We to have to make a directed graph with this data.\\
+We have to find the Pagerank of this dataset that is we have find the most important node in this directed graph. We can achieve this by random walk method with teleportation.\\
+Now, we have to find the missing links from the graph. Two nodes in the graph can be disconnected if none of them found each other impressive or there may be a case where they didn't meet, this are missing links. We have to find these connections.
+\section{Graph}
+We converted the existing excel file into a CSV file and deleted everything expect the entry numbers. \\
+We read this CSV file by using pandas library,  we first made a empty graph using the Networkx library.  We added the primary nodes that is the first column of the file, which are the people who are taking the impression, Then we iterated through every row of the file, if a impression in a particular row is not empty, then we add a edge between the primary node and the impressive node. We get the following graph from this method.
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=1\linewidth]{Screenshot (26).png}
+    \caption{Graph}
+    \label{fig:enter-label}
+\end{figure}
+\section{Simulating Random Walk}
+
+Now, we define a function of random walk in the graph. First we make a dictionary and assign 0 to each node and as we visit the node, we increment the value by 1.  \\
+We randomly choose a node from the graph and then make a list of all the neighbours of the current node. \\
+We now with a probability of 0.85 jump to a next node which is the neighbour of the current node or we move to a randomly selected node to avoid being stuck in a loop of nodes.\\
+After running this operations many times, we rank the nodes according to the times we visited these nodes. By this we got the PageRank of the graph.
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{Screenshot (27).png}
+    \caption{Random Walk}
+    \label{fig:enter-label}
+\end{figure}
+\section{Missing links}
+We now have to find the missing links from the graph. First we will take all the nodes from the graph and make a adjacency matrix with those nodes.\\\\
+A adjacency matrix is matrix representation of the connection between any two nodes of the graph.\\\\
+If there exist a edge between two nodes, the corresponding entry in the matrix will set to 1 and 0 otherwise. We use Networkx library to make a adjacency matrix.\\\\
+Now I found the entries which are 0 and also its transpose entry is 0. This connection may be a missing link.\\\\
+Now, we delete the row and the column in which one of the entry lies and store it. This row and column contain every other entry excluding the missing link. \\\\
+Now, we use the inbuilt function in numpy library named lstsq to find the solution for the equation AX= R, where A is the adjacency matrix and R is the row matrix.\\\\
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{Screenshot (30).png}
+    \caption{Missing link}
+    \label{fig:enter-label}
+\end{figure}
+Now, we dot X with the column we stored to find the value of the missing link, it will give us the approximate value of the missing link.\\\\
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{Screenshot (32).png}
+    \caption{Cycle existance}
+    \label{fig:enter-label}
+\end{figure}
+We will have to set a value above which, we can say that it is a missing link otherwise they didn't find each other impressive. I had set this value as 0.5 in my code.\\
+\section{Cycle existance in a graph}
+
+In the section, I found if the graph has a cycle or not. \\
+Firstly, I defined a function named cycle and kept a track of all visited nodes and the nodes existed in the path which I am traversing currently. \\\\The visited set restrict us to repeat the dfs from already used node.\\
+Now, I made a nested function for depth first search to find the cycles in the graph which takes any node as a argument. \\\\
+In the next step, I see all the neighbours of the current node, if any neighbour exist in the current set, they we have a cycle in the graph. \\\\Otherwise recursively call the function on the neighbour till we find a cycle.\\\\
+If we don't find a cycle from starting from a particular node, they we will remove it from the current set and return false for that particular node.\\\\
+Now, we will call the same for every node till we find a cycle for a node. If we didn't found a cycle for any of the node, the parent function will return False.
+\section{Significance}
+Detecting cycles in a graph is significant for various reasons. If we need to check a given graph is a tree or not we will need to check that the graph has no cycles.\\\\
+Checking if a graph has a cycle or not prevents us to get stuck in infinite loops.\\\\
+Many graph algorithms, such as topological sorting, shortest path algorithms (like Dijkstra's), assume that the graph is acyclic. Detecting cycles allows algorithms to handle such cases appropriately or even modify the graph structure if necessary. 
+
+\end{document}
